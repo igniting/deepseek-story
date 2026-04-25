@@ -4,8 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DeepSeek V4: A View from the Twelfth Floor</title>
+  <meta property="og:title" content="DeepSeek V4: A View from the Twelfth Floor">
+  <meta property="og:description" content="A fictional account of 18 months inside a lab in Yuhang — the departures, the Huawei engineers, the training run, and the morning the model shipped.">
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DeepSeek V4: A View from the Twelfth Floor">
+  <meta name="twitter:description" content="A fictional account of 18 months inside a lab in Yuhang — the departures, the Huawei engineers, the training run, and the morning the model shipped.">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap');
+
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: var(--accent);
+      z-index: 1000;
+      transition: width 50ms linear;
+    }
 
     *, *::before, *::after {
       margin: 0;
@@ -59,11 +77,15 @@
       line-height: 1.5;
     }
 
-    header .date {
+    header .meta {
       font-size: 0.9rem;
       color: var(--text-secondary);
       margin-top: 0.5rem;
       letter-spacing: 0.03em;
+    }
+
+    header .meta span + span::before {
+      content: "\00a0\00b7\00a0";
     }
 
     section {
@@ -75,14 +97,6 @@
       font-weight: 600;
       margin-bottom: 1.75rem;
       letter-spacing: -0.01em;
-    }
-
-    section h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-top: 2.5rem;
-      margin-bottom: 1rem;
-      color: var(--text);
     }
 
     p {
@@ -163,9 +177,27 @@
       color: var(--text);
     }
 
+    .section-indicator {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .section-indicator.visible {
+      opacity: 1;
+    }
+
     @media (max-width: 600px) {
       body {
         font-size: 17px;
+        line-height: 1.85;
       }
 
       .container {
@@ -183,15 +215,58 @@
       section {
         margin-bottom: 2.75rem;
       }
+
+      .section-indicator {
+        bottom: 1rem;
+        right: 1rem;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #e0ddd5;
+        --text-secondary: #a09a8e;
+        --bg: #1a1917;
+        --accent: #c45454;
+        --rule: #3a3832;
+      }
+    }
+
+    @media print {
+      .reading-progress,
+      .section-indicator {
+        display: none;
+      }
+
+      body {
+        background: white;
+        color: black;
+        font-size: 11pt;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 0;
+      }
+
+      section {
+        page-break-inside: avoid;
+      }
+
+      footer {
+        page-break-before: always;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="reading-progress" id="progress"></div>
+  <div class="section-indicator" id="section-indicator"></div>
   <div class="container">
     <header>
       <h1>DeepSeek V4: A View from the Twelfth Floor</h1>
       <div class="subtitle">A fictional account of 18 months inside a lab in Yuhang</div>
-      <div class="date">April 2026</div>
+      <div class="meta"><span>April 2026</span><span>~40 min read</span></div>
     </header>
 
     <!-- Section I: The Inheritance -->
@@ -199,7 +274,6 @@
       <span class="section-number">I</span>
       <h2>The Inheritance</h2>
 
-      <h3>A morning in Yuhang</h3>
 
       <p>April 24, 2026. The light comes up over Yuhang the way it comes up most mornings in late April, which is to say slowly and at a low angle, with a haze on the canal that the locals call <em>yan</em> and the meteorologists call particulate, both of them right in their own way. My alarm goes off at 6:15. I lie in bed for another four minutes because the alarm is, in practice, a suggestion, and at 6:19 I get up and put water on for tea.</p>
 
@@ -211,7 +285,6 @@
 
       <p>I get off at 8:11. I walk the 400 meters from the station to our building, past the noodle place that opens at 11, past the convenience store that has been our default snack supply since I joined, past the little planted area with the magnolia tree that has just finished flowering and is now putting out its first wide green leaves.</p>
 
-      <h3>The lab as a place</h3>
 
       <p>The twelfth floor at 8:15. Perhaps eleven people on the floor. The cleaning staff has been through. The desks are mostly clear except for the desks of the two people who slept here, one of whom is Chen Wei, on the conference room couch where he has been sleeping at least three nights a week since the second week of February.</p>
 
@@ -221,7 +294,6 @@
 
       <p>The meeting rooms are in the middle of the floor, three in a row, with doors on both long sides that push open in either direction. In the 2024 interview that everyone read after R1, the founder told the journalist that the doors had been designed to leave room for serendipity — that the Transformer paper had, by some accounts, begun with a researcher overhearing a conversation through an open door. I have never decided whether I believed the story, but the doors had been there the whole time. They were doors.</p>
 
-      <h3>The waiting</h3>
 
       <p>At 8:40, Chen Wei comes out of the conference room with his hair pressed flat on one side and his glasses smudged. He is wearing the same black t-shirt he was wearing yesterday, which is the same one he was wearing the day before. He nods at me and goes to the kitchen. He comes back with two mugs and puts one on my desk without asking. He has correctly assumed it is the same tea as his — a green tea from a small farm near Longjing Village that his cousin works at.</p>
 
@@ -258,7 +330,6 @@
       <span class="section-number">II</span>
       <h2>The Year of Pressure</h2>
 
-      <h3>After R1</h3>
 
       <p>January 20, 2025. R1 ships at 5 PM Beijing time, two weeks before Lunar New Year. I am at my parents' apartment in Hefei because my mother has made it clear, by way of three separate WeChat messages, that early is the new on-time. The apartment is the one I grew up in, on the seventh floor near the Anhui University campus. My father is in the kitchen making jiaozi. My mother is watching a variety show I do not recognize. I am at the small desk in my old bedroom, which still has the desk lamp I used for homework and a shelf of textbooks nobody has thought to throw away.</p>
 
@@ -276,7 +347,6 @@
 
       <p>I do not reply to any of them. What I am thinking about, that morning, is what is in the inboxes of the more senior people on the floor.</p>
 
-      <h3>The talent war</h3>
 
       <p>What was in their inboxes was something larger than what was in mine.</p>
 
@@ -300,7 +370,6 @@
 
       <p>In the three months that followed, two more senior researchers left. By the end of March, the floor had lost five names the field knew. The lab still had 150 researchers. We were not gutted. The people who stayed had stayed. The people who left were not traitors for leaving. The calculus was different for each person, and was private, and was theirs. We came in. We went home at six. We came in again the next day.</p>
 
-      <h3>The Huawei year</h3>
 
       <p>Through all of this — the departures, the offers we were not accepting — the work that occupied the second half of 2025 and the first quarter of 2026 was trying to train V4 on Huawei's chips.</p>
 
@@ -334,7 +403,6 @@
       <span class="section-number">III</span>
       <h2>The Architecture</h2>
 
-      <h3>What we had and what we needed</h3>
 
       <p>By the time we came back from Lunar New Year on February 16, we had three months until the launch window. We did not have a model. We had a set of architectural decisions that had survived the previous quarter and a set that had not.</p>
 
@@ -348,7 +416,6 @@
 
       <p>What we did not have was a way to do attention at a million tokens that we believed in. Three candidate designs had been competing internally since the previous summer: a linear attention mechanism, a more aggressive MLA variant with deeper compression, and a hybrid sparse-and-compressed scheme that had been considered the weakest of the three. We did not, by mid-February, have a decision.</p>
 
-      <h3>The arguments</h3>
 
       <p>The first argument was about attention. The team had formed informally in the first week of January around a researcher I will call Jia, who is one of the people whose name is on the V4 paper as co-first-author and whose contribution I am beginning to feel a vague guilt about underrepresenting. Jia is approximately my age. She joined the lab six months after I did. Her work had been on the indexer mechanism in V3.2's DSA, and her interest in V4 was that she had spent the previous year persuaded the indexer was the right mechanism operating on the wrong representation. Her view, which she had been articulating since at least August, was that you needed to compress the KV cache along the sequence dimension first and then run the indexer on the compressed representation. Compress, then sparsely select — mathematically more efficient than either alone.</p>
 
@@ -386,7 +453,6 @@
       <span class="section-number">IV</span>
       <h2>The Cluster</h2>
 
-      <h3>What a training run is</h3>
 
       <p>A training run is not a launch. The press describes it as a thing that succeeds or fails, the way a rocket succeeds or fails, with the events in between treated as an unbroken arc. A training run is more like a long voyage on a ship that has been built mostly correctly but that needs adjustment in dozens of small ways during the journey, staffed by people who take shifts at the wheel and at the engine and who, between shifts, sleep in bunks and eat food cooked in advance and emerge for their watches and go back below. The ship is mostly fine. The watches are mostly boring. The crew develops, over the course of the voyage, a relationship with the ship that is not romantic but is also not nothing.</p>
 
@@ -394,7 +460,6 @@
 
       <p>The run was scheduled for 42 days. It would take 46. The first two weeks were uneventful. The sequence-length warmup ran from 4K to 16K to 64K. The Muon optimizer behaved as it had in the smaller runs. The mHC residual scheme held. The loss curve descended in the smooth, slightly noisy way that means the model is learning — the small daily wobbles that mean nothing and the broader weekly trend that means everything. I checked the dashboard on my phone in the evenings. Chen checked it more often. Su checked it less often than either of us, which I understood to be either confidence or fatalism and which I never asked her to clarify.</p>
 
-      <h3>The spike</h3>
 
       <p>The unplanned pause came at step 470,000, on the morning of March 18, during the long-context phase at 1M sequence length.</p>
 
@@ -449,7 +514,6 @@
 
       <p>The line in the technical report — <em>the underlying principles remain insufficiently understood</em> — refers, among other things, to this episode. We do not have a clean theoretical account of why Anticipatory Routing works where it works, or how to predict the spike threshold from first principles. We argued, the week before submission, about whether to print the line. The argument was about whether it would be read as honesty or weakness. I was on the side that thought weakness. I was wrong. The line is in the paper.</p>
 
-      <h3>The post-training</h3>
 
       <p>The base model finished training on April 13. The on-call engineer checked the final loss, ran the evaluation suite, confirmed the numbers matched the trajectory, and posted: <span class="chinese"><em>训练完成.</em></span> Training complete. There was no celebration. The base model was a base model. The model that would ship in 11 days was not yet built.</p>
 
@@ -489,7 +553,6 @@
       <span class="section-number">V</span>
       <h2>The Week the World Arrived</h2>
 
-      <h3>The eight days before</h3>
 
       <p>The week before V4 launched, the world arrived in a sequence that is part of what made the week feel the way it felt.</p>
 
@@ -513,7 +576,6 @@
 
       <p>The Opus 4.7 launch, the fundraising report, GPT-5.5, the Kratsios speech — taken together they formed a week in which the surrounding context of our launch had become unusually loud. We had hoped to ship into a quieter week. We were not going to.</p>
 
-      <h3>April 24</h3>
 
       <p>I described the morning of April 24 in Section I. The Hugging Face repository went public at 09:20. The Huawei livestream began at 09:47, watched by approximately 400,000 people in its first hour. The engineers demonstrated V4-Pro running on an Ascend 950 SuperPod with low-latency inference. The model-chip-cloud closed loop, which the Chinese press had been writing about for a year, locked into the narrative the way a long-anticipated thing locks in when it finally arrives.</p>
 
@@ -574,5 +636,27 @@
       <p>This is a work of fiction. The narrator, characters, and events are imagined. Technical details draw on publicly available information about DeepSeek and the broader AI industry; organizational details, internal dynamics, and personal narratives are invented. No claim is made to represent the views or experiences of any real person at DeepSeek or any other organization.</p>
     </footer>
   </div>
+  <script>
+    const progress = document.getElementById('progress');
+    const indicator = document.getElementById('section-indicator');
+    const sections = document.querySelectorAll('section[id]');
+    const labels = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+    let hideTimer;
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.width = (scrollTop / docHeight * 100) + '%';
+
+      let current = 0;
+      sections.forEach((s, i) => {
+        if (scrollTop >= s.offsetTop - window.innerHeight * 0.3) current = i;
+      });
+      indicator.textContent = labels[current] + ' of VI';
+      indicator.classList.add('visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => indicator.classList.remove('visible'), 1500);
+    }, { passive: true });
+  </script>
 </body>
 </html>
